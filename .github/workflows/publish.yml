@@ -1,0 +1,27 @@
+on: push
+jobs:
+  pdm-build:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+    name: Build package whl file
+    runs-on: ubuntu-latest
+    environment:
+      name: PyPi
+      url: https://pypi.org/p/arkush
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup PDM
+        uses: pdm-project/setup-pdm@v4
+      - name: Build Package
+        run: pdm build
+  pypi-publish:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+    name: Upload release to PyPI
+    runs-on: ubuntu-latest
+    environment:
+      name: PyPi
+      url: https://pypi.org/p/arkush
+    permissions:
+      id-token: write
+    steps:
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
